@@ -6,6 +6,7 @@ import threading
 
 filterwarnings('ignore')
 
+
 class ThreadDBScan(threading.Thread):
     def __init__(self, name):
         threading.Thread.__init__(self)
@@ -46,3 +47,5 @@ thread2 = ThreadAgnes("Thread-Agnes")
 thread0.start()
 thread1.start()
 thread2.start()
+
+# clusters.TESTS()

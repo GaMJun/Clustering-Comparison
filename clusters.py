@@ -13,6 +13,71 @@ x = data_frame.iloc[:, 0:2].values
 y = data_frame.iloc[:, 2].values
 
 
+def TESTS():
+    Cluster = DBSCAN(eps=26, min_samples=116)
+    Cluster.fit(x)
+    clusters = Cluster.fit_predict(x)
+    values, counts = np.unique(Cluster.fit_predict(x), return_counts=True)
+    print(len(values), values)
+    print(len(clusters))
+
+    for i in range(len(clusters)):
+        if (clusters[i] == 0):
+            print(x[i][0], ",", x[i][1], ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", ",")
+        if (clusters[i] == 1):
+            print(x[i][0], ",", ",", x[i][1], ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", ",")
+        if (clusters[i] == -1):
+            print(x[i][0], ",", ",", ",", x[i][1], ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", ",")
+        if (clusters[i] == 3):
+            print(x[i][0], ",", ",", ",", ",", x[i][1], ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", ",")
+        if (clusters[i] == 4):
+            print(x[i][0], ",", ",", ",", ",", ",", x[i][1], ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", ",")
+        if (clusters[i] == 5):
+            print(x[i][0], ",", ",", ",", ",", ",", ",", x[i][1], ",", ",", ",", ",", ",", ",", ",", ",", ",", ",")
+        if (clusters[i] == 6):
+            print(x[i][0], ",", ",", ",", ",", ",", ",", ",", x[i][1], ",", ",", ",", ",", ",", ",", ",", ",", ",")
+        if (clusters[i] == 7):
+            print(x[i][0], ",", ",", ",", ",", ",", ",", ",", ",", x[i][1], ",", ",", ",", ",", ",", ",", ",", ",")
+        if (clusters[i] == 8):
+            print(x[i][0], ",", ",", ",", ",", ",", ",", ",", ",", ",", x[i][1], ",", ",", ",", ",", ",", ",", ",")
+        if (clusters[i] == 9):
+            print(x[i][0], ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", x[i][1], ",", ",", ",", ",", ",", ",")
+        if (clusters[i] == 10):
+            print(x[i][0], ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", x[i][1], ",", ",", ",", ",", ",")
+        if (clusters[i] == 11):
+            print(x[i][0], ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", x[i][1], ",", ",", ",", ",")
+        if (clusters[i] == 12):
+            print(x[i][0], ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", x[i][1], ",", ",", ",")
+        if (clusters[i] == 13):
+            print(x[i][0], ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", x[i][1], ",", ",")
+        if (clusters[i] == 14):
+            print(x[i][0], ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", x[i][1], ",")
+        if (clusters[i] == 15):
+            print(x[i][0], ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", ",", x[i][1])
+
+    best_eps = []
+    best_min_samples = []
+    for eps in range(20, 50):
+        for min_samples in range(111, 301):
+            ClusterDBScan = DBSCAN(eps=eps, min_samples=min_samples)
+            ClusterDBScan.fit(x)
+
+            values, counts = np.unique(ClusterDBScan.fit_predict(x), return_counts=True)
+            if (values[0] == -1 and counts[0] < 150) and (
+                    (values[0] == -1 and len(values) > 2) or (values[0] != -1 and len(values) > 1)):
+                best_min_samples.append(min_samples)
+                best_eps.append(eps)
+    print(values, counts)
+    # 250 erros eps 20 - 30 min-samples 100 - 259
+    # 150 erros eps 26 - 29 min-samples 111 - 229
+    # o melhor foi 150 erros eps 26 - 33 min-samples 111 - 300
+    # [32, 33]
+    # [300, 300]
+
+    print(best_eps)
+    print(best_min_samples)
+
+
 def cohesion(clusters):
     values, counts = np.unique(clusters, return_counts=True)
 
@@ -154,39 +219,42 @@ def fbp_db():
     aux_separability = -inf
     aux_silhouette = -inf
 
-    for eps in range(10, 21):
-        for min_samples in range(100, 270, 10):
+    for eps in range(26, 33):
+        for min_samples in range(111, 301):
             ClusterDBScan = DBSCAN(eps=eps, min_samples=min_samples)
             ClusterDBScan.fit(x)
 
             # print("Calculando com métrica de coesão. eps =", eps, "min_samples =", min_samples)
-            aux_aux = cohesion(ClusterDBScan.fit_predict(x))
-            if aux_aux < aux_cohesion:
-                aux_cohesion = aux_aux
-                best_eps[0] = eps
-                best_min_samples[0] = min_samples
+            values, counts = np.unique(ClusterDBScan.fit_predict(x), return_counts=True)
+            if (values[0] == -1 and counts[0] < 150) and (
+                    (values[0] == -1 and len(values) > 2) or (values[0] != -1 and len(values) > 1)):
+                aux_aux = cohesion(ClusterDBScan.fit_predict(x))
+                if aux_aux < aux_cohesion:
+                    aux_cohesion = aux_aux
+                    best_eps[0] = eps
+                    best_min_samples[0] = min_samples
 
-            # print("Calculando com métrica de entropia. eps =", eps, "min_samples =", min_samples)
-            aux_aux = entropy(ClusterDBScan.fit_predict(x))
-            if aux_aux < aux_entropy:
-                aux_entropy = aux_aux
-                best_eps[1] = eps
-                best_min_samples[1] = min_samples
+                # print("Calculando com métrica de entropia. eps =", eps, "min_samples =", min_samples)
+                aux_aux = entropy(ClusterDBScan.fit_predict(x))
+                if aux_aux < aux_entropy:
+                    aux_entropy = aux_aux
+                    best_eps[1] = eps
+                    best_min_samples[1] = min_samples
 
-            # print("Calculando com métrica de separabilidade. eps =", eps, "min_samples =", min_samples)
-            aux_aux = separability(ClusterDBScan.fit_predict(x))
-            if aux_aux > aux_separability:
-                aux_separability = aux_aux
-                best_eps[2] = eps
-                best_min_samples[2] = min_samples
+                # print("Calculando com métrica de separabilidade. eps =", eps, "min_samples =", min_samples)
+                aux_aux = separability(ClusterDBScan.fit_predict(x))
+                if aux_aux > aux_separability:
+                    aux_separability = aux_aux
+                    best_eps[2] = eps
+                    best_min_samples[2] = min_samples
 
-            # print("Calculando com métrica de silhueta. eps =", eps, "min_samples =", min_samples)
-            aux_aux = silhouette(ClusterDBScan.fit_predict(x))
-            if aux_aux > aux_silhouette:
-                aux_silhouette = aux_aux
-                best_eps[3] = eps
-                best_min_samples[3] = min_samples
-            # print("=============================================================================")
+                # print("Calculando com métrica de silhueta. eps =", eps, "min_samples =", min_samples)
+                aux_aux = silhouette(ClusterDBScan.fit_predict(x))
+                if aux_aux > aux_silhouette:
+                    aux_silhouette = aux_aux
+                    best_eps[3] = eps
+                    best_min_samples[3] = min_samples
+                # print("=============================================================================")
 
     print("DBScan cohesion =", aux_cohesion, "eps = ", best_eps[0], "min_samples = ", best_min_samples[0])
     print("DBScan entropy =", aux_entropy, "eps = ", best_eps[1], "min_samples = ", best_min_samples[1])
